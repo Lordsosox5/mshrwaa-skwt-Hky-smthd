@@ -7,6 +7,7 @@ import { isLiquidGlassAvailable } from 'expo-glass-effect';
 import { Tabs } from 'expo-router';
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { SymbolView } from 'expo-symbols';
+import { AppText } from '@/components/AppText';
 
 function NativeTabLayout() {
   return (
@@ -69,6 +70,7 @@ function ClassicTabLayout() {
         name="index"
         options={{
           title: 'الرئيسية',
+          tabBarLabel: ({ color }) => <AppText style={{ color, fontSize: 10, fontWeight: '600' }}>الرئيسية</AppText>,
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="book.closed" tintColor={color} size={23} />
@@ -81,6 +83,7 @@ function ClassicTabLayout() {
         name="chapters"
         options={{
           title: 'الفصول',
+          tabBarLabel: ({ color }) => <AppText style={{ color, fontSize: 10, fontWeight: '600' }}>الفصول</AppText>,
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="text.book.closed" tintColor={color} size={23} />
@@ -93,6 +96,7 @@ function ClassicTabLayout() {
         name="saved"
         options={{
           title: 'المحفوظات',
+          tabBarLabel: ({ color }) => <AppText style={{ color, fontSize: 10, fontWeight: '600' }}>المحفوظات</AppText>,
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="bookmark" tintColor={color} size={23} />
