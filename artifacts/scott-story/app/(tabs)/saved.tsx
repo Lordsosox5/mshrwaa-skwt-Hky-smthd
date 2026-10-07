@@ -1,6 +1,6 @@
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { Pressable, ScrollView, StatusBar, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StatusBar, StyleSheet, View } from 'react-native';
 import { AppText as Text } from '@/components/AppText';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
@@ -20,12 +20,17 @@ export default function SavedScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.content,
-          { paddingTop: insets.top + 12, paddingBottom: PlatformBottom(insets.bottom) },
+          {
+            paddingTop: Platform.OS === 'web' ? 67 : Math.max(10, insets.top * 0.15),
+            paddingBottom: PlatformBottom(insets.bottom),
+          },
         ]}
       >
-        <Text style={[styles.kicker, { color: colors.primary }]}>علاماتك</Text>
-        <View style={styles.heading}>
-          <Text style={[styles.title, { color: colors.foreground }]}>فصول محفوظة</Text>
+        <View style={styles.header}>
+          <View>
+            <Text style={[styles.kicker, { color: colors.primary }]}>علاماتك</Text>
+            <Text style={[styles.title, { color: colors.foreground }]}>فصول محفوظة</Text>
+          </View>
           <View style={[styles.count, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Text style={[styles.countText, { color: colors.foreground }]}>{bookmarks.length}</Text>
           </View>
@@ -100,11 +105,11 @@ function PlatformBottom(bottomInset: number) {
 const styles = StyleSheet.create({
   safe: { flex: 1 },
   content: { paddingHorizontal: 22, gap: 7 },
+  header: { flexDirection: 'row-reverse', alignItems: 'flex-end', justifyContent: 'space-between', paddingBottom: 18 },
   kicker: { fontSize: 12, fontWeight: '700', textAlign: 'right' },
-  heading: { flexDirection: 'row-reverse', alignItems: 'center', gap: 10 },
-  title: { fontSize: 27, fontWeight: '800', textAlign: 'right' },
-  count: { minWidth: 31, height: 31, borderRadius: 11, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  countText: { fontSize: 12, fontWeight: '700' },
+  title: { fontSize: 27, fontWeight: '800', textAlign: 'right', marginTop: 5 },
+  count: { borderWidth: 1, paddingVertical: 8, paddingHorizontal: 11, borderRadius: 12 },
+  countText: { fontSize: 11, fontWeight: '700' },
   intro: { fontSize: 13, lineHeight: 22, textAlign: 'right', marginBottom: 16 },
   empty: { alignItems: 'center', borderWidth: 1, borderRadius: 24, paddingHorizontal: 24, paddingVertical: 32, gap: 12 },
   emptyIcon: { width: 52, height: 52, borderRadius: 18, alignItems: 'center', justifyContent: 'center', marginBottom: 2 },
