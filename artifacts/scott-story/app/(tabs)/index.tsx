@@ -1,11 +1,11 @@
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { Image, ImageBackground, Platform, Pressable, ScrollView, StatusBar, StyleSheet, View } from 'react-native';
+import { Image, Platform, Pressable, ScrollView, StatusBar, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { AppText as Text } from '@/components/AppText';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
-import { chapters, chapterArtwork, parts, storyMeta } from '@/lib/story';
+import { chapters, chapterArtwork, partCoverArtwork, parts } from '@/lib/story';
 import { useReader } from '@/context/ReaderContext';
 
 const featuredIds = ['1', '3', '19'];
@@ -13,12 +13,13 @@ const featuredIds = ['1', '3', '19'];
 export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { width: viewportWidth } = useWindowDimensions();
   const { preferences } = useReader();
   const currentChapter = chapters.find((chapter) => chapter.id === preferences.lastChapterId) ?? chapters[0];
   const currentProgress = preferences.progressByChapter[currentChapter.id] ?? 0;
   const chapterCount = new Intl.NumberFormat('ar').format(chapters.length);
-  const secondPart = parts.find((part) => part.id === '2');
-  const secondPartStart = chapters.find((chapter) => chapter.partId === '2');
+  const coverGridWidth = Math.max(0, Math.min(viewportWidth - 44, 520));
+  const coverHeight = Math.max(180, ((coverGridWidth - 12) / 2) * (2775 / 1846));
   const openReader = (id: string) => router.push({ pathname: '/reader/[id]', params: { id } });
 
   return (
@@ -47,26 +48,36 @@ export default function HomeScreen() {
           </Pressable>
         </View>
 
-        <View style={styles.coverFrame}>
-          <ImageBackground source={chapterArtwork['1']} resizeMode="cover" style={styles.cover}>
-            <LinearGradient
-              colors={['rgba(12,13,14,0.02)', 'rgba(12,13,14,0.22)', 'rgba(12,13,14,0.94)']}
-              locations={[0, 0.38, 1]}
-              style={StyleSheet.absoluteFill}
-            />
-            <View style={styles.coverTopline}>
-              <View style={styles.tag}>
-                <View style={[styles.tagDot, { backgroundColor: colors.primary }]} />
-                <Text style={styles.tagText}>رواية رعب وغموض</Text>
-              </View>
-              <Text style={styles.coverCount}>{chapterCount} فصلاً</Text>
-            </View>
-            <View style={styles.coverCopy}>
-              <Text style={styles.coverKicker}>طائفة اسمثدا</Text>
-              <Text style={styles.coverTitle}>{storyMeta.title}</Text>
-              <Text style={styles.coverAuthor}>أسامة آدم · نايتز للنشر</Text>
-            </View>
-          </ImageBackground>
+        <View style={styles.coverHeader}>
+          <Text style={[styles.coverHeaderTitle, { color: colors.mutedForeground }]}>أغلفة الرواية</Text>
+          <Text style={[styles.coverCount, { color: colors.primaryForeground, backgroundColor: colors.primary }]}>
+            {chapterCount} فصلاً
+          </Text>
+        </View>
+        <View style={styles.coverGrid}>
+          {parts.map((part) => {
+            const cover = partCoverArtwork[part.id];
+            const firstChapter = chapters.find((chapter) => chapter.partId === part.id);
+            if (!cover || !firstChapter) return null;
+            return (
+              <Pressable
+                key={part.id}
+                accessibilityRole="button"
+                accessibilityLabel={`ابدأ ${part.label}: ${part.title}`}
+                testID={`open-part-${part.id}`}
+                onPress={() => openReader(firstChapter.id)}
+                style={({ pressed }) => [styles.coverCard, pressed && styles.pressed]}
+              >
+                <View style={[styles.coverFrame, { height: coverHeight, backgroundColor: colors.card, borderColor: colors.border }]}>
+                  <Image source={cover} resizeMode="contain" style={styles.coverImage} />
+                </View>
+                <View style={styles.coverCaption}>
+                  <Text style={[styles.coverPart, { color: colors.primary }]}>{part.label}</Text>
+                  <Text style={[styles.coverTitle, { color: colors.foreground }]} numberOfLines={1}>{part.title}</Text>
+                </View>
+              </Pressable>
+            );
+          })}
         </View>
 
         <Pressable
@@ -89,32 +100,6 @@ export default function HomeScreen() {
           </View>
           <Feather name="arrow-left" size={19} color={colors.primaryForeground} />
         </Pressable>
-
-        {secondPart && secondPartStart ? (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`ابدأ ${secondPart.label}: ${secondPart.title}`}
-            testID="start-part-two"
-            onPress={() => openReader(secondPartStart.id)}
-            style={({ pressed }) => [
-              styles.partCard,
-              { backgroundColor: colors.card, borderColor: colors.border },
-              pressed && styles.pressed,
-            ]}
-          >
-            <View style={[styles.partIcon, { backgroundColor: colors.accent }]}>
-              <Ionicons name="book-outline" size={19} color={colors.accentForeground} />
-            </View>
-            <View style={styles.partCopy}>
-              <Text style={[styles.partLabel, { color: colors.primary }]}>{secondPart.label}</Text>
-              <Text style={[styles.partTitle, { color: colors.foreground }]}>{secondPart.title}</Text>
-              <Text style={[styles.partMeta, { color: colors.mutedForeground }]}>
-                {new Intl.NumberFormat('ar').format(secondPart.chapterCount)} فصلاً · ابدأ القراءة
-              </Text>
-            </View>
-            <Feather name="arrow-left" size={18} color={colors.mutedForeground} />
-          </Pressable>
-        ) : null}
 
         <View style={styles.sectionHeading}>
           <View>
@@ -186,28 +171,21 @@ const styles = StyleSheet.create({
   eyebrow: { fontSize: 12, fontWeight: '700', letterSpacing: 0.6, textAlign: 'right' },
   topTitle: { fontSize: 25, fontWeight: '700', textAlign: 'right', marginTop: 4 },
   iconButton: { width: 44, height: 44, borderWidth: 1, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-  coverFrame: { borderRadius: 28, overflow: 'hidden' },
-  cover: { height: 340, justifyContent: 'space-between', padding: 20 },
-  coverTopline: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' },
-  tag: { flexDirection: 'row-reverse', alignItems: 'center', gap: 7, paddingHorizontal: 11, paddingVertical: 8, borderRadius: 100, backgroundColor: 'rgba(15,15,14,0.66)' },
-  tagDot: { width: 6, height: 6, borderRadius: 6 },
-  tagText: { color: '#F4EEE3', fontSize: 11, fontWeight: '600' },
-  coverCount: { color: '#F4EEE3', fontSize: 12, fontWeight: '600', backgroundColor: 'rgba(15,15,14,0.66)', paddingHorizontal: 11, paddingVertical: 8, borderRadius: 100 },
-  coverCopy: { alignItems: 'flex-end' },
-  coverKicker: { color: '#E6B478', fontSize: 13, fontWeight: '700', marginBottom: 6 },
-  coverTitle: { color: '#FFF9EF', fontSize: 34, fontWeight: '800', textAlign: 'right' },
-  coverAuthor: { color: '#DDD4C6', fontSize: 12, marginTop: 8 },
+  coverHeader: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' },
+  coverHeaderTitle: { fontSize: 12, fontWeight: '700' },
+  coverCount: { fontSize: 11, fontWeight: '700', paddingHorizontal: 11, paddingVertical: 7, borderRadius: 100 },
+  coverGrid: { width: '100%', maxWidth: 520, alignSelf: 'center', flexDirection: 'row-reverse', gap: 12 },
+  coverCard: { flex: 1, gap: 8 },
+  coverFrame: { borderRadius: 18, borderWidth: 1, overflow: 'hidden' },
+  coverImage: { width: '100%', height: '100%' },
+  coverCaption: { alignItems: 'flex-end', gap: 2, paddingHorizontal: 2 },
+  coverPart: { fontSize: 10, fontWeight: '700', textAlign: 'right' },
+  coverTitle: { fontSize: 13, fontWeight: '800', textAlign: 'right' },
   continueButton: { minHeight: 72, borderRadius: 20, paddingHorizontal: 15, flexDirection: 'row-reverse', alignItems: 'center', gap: 12 },
   continueIcon: { width: 40, height: 40, borderRadius: 14, backgroundColor: 'rgba(0,0,0,0.11)', alignItems: 'center', justifyContent: 'center' },
   continueCopy: { flex: 1, alignItems: 'flex-end', gap: 3 },
   continueLabel: { fontSize: 15, fontWeight: '800' },
   continueMeta: { fontSize: 12, opacity: 0.82 },
-  partCard: { minHeight: 82, borderRadius: 20, borderWidth: 1, paddingHorizontal: 14, paddingVertical: 12, flexDirection: 'row-reverse', alignItems: 'center', gap: 12 },
-  partIcon: { width: 40, height: 40, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  partCopy: { flex: 1, alignItems: 'flex-end', gap: 3 },
-  partLabel: { fontSize: 10, fontWeight: '700' },
-  partTitle: { fontSize: 14, fontWeight: '800', textAlign: 'right' },
-  partMeta: { fontSize: 10, textAlign: 'right' },
   sectionHeading: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', marginTop: 5 },
   sectionTitle: { fontSize: 18, fontWeight: '800', textAlign: 'right' },
   sectionCaption: { fontSize: 12, textAlign: 'right', marginTop: 4 },

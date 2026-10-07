@@ -36,6 +36,11 @@ export const chapterArtwork: Record<string, ImageSourcePropType> = {
   '19': require('../assets/images/scott-church.jpg'),
 };
 
+export const partCoverArtwork: Record<string, ImageSourcePropType> = {
+  '1': require('../assets/images/cover-smithda.jpg'),
+  '2': require('../assets/images/cover-golden-grave.jpg'),
+};
+
 export function getChapter(id: string): StoryChapter | undefined {
   return chapters.find((chapter) => chapter.id === id);
 }
