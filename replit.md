@@ -1,19 +1,24 @@
-# [Project name]
+# مشروع سكوت (Scott Story)
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+An Arabic-first Expo reading app with illustrated chapters, bookmarks, reading themes, and locally saved progress.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- Install dependencies with `pnpm install --frozen-lockfile`.
+- Use Replit's Run button or start the managed workflow `artifacts/scott-story: expo` to open the app preview. The workflow supplies the Expo domain configuration and `PORT` (23215); do not start Expo outside the managed workflow.
+- `artifacts/api-server: API Server` — optional Express API workflow (port 8080); `GET /api/healthz` returns `{"status":"ok"}`.
+- The canvas preview workflow is not required to run the reader.
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- The current reader and API health endpoint require no additional secrets or database. Reader preferences and progress use AsyncStorage on the device/browser.
+- `DATABASE_URL` is needed only if database-backed features are added using the existing DB package; the current API does not import that package.
 
 ## Stack
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
+- pnpm workspaces, Node.js, TypeScript
+- Mobile: Expo SDK 57, React Native, Expo Router
 - API: Express 5
 - DB: PostgreSQL + Drizzle ORM
 - Validation: Zod (`zod/v4`), `drizzle-zod`
@@ -22,7 +27,10 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/scott-story/` — Expo app, routes, bundled story content, and illustrations.
+- `artifacts/api-server/` — Express API with health endpoint.
+- `lib/` — shared API contracts, generated clients, and unused database package.
+- `artifacts/mockup-sandbox/` — optional design previews.
 
 ## Architecture decisions
 
@@ -30,7 +38,7 @@ _Populate as you build — non-obvious choices a reader couldn't infer from the 
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+Read chapters in Arabic, adjust font size and reading theme, bookmark chapters, and resume locally saved progress.
 
 ## User preferences
 
@@ -38,7 +46,10 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Keep the `proxy-addr` override: the imported lockfile's older version was blocked by the package security registry.
+- Initial Expo preview loading can take longer while Metro compiles the bundle and Arabic fonts load.
+- React Native's optional desktop DevTools reports missing Linux GUI libraries in this container. This does not prevent Metro or the app preview from running.
+- Browser preview and type checks were verified during import setup; physical-device behavior has not been verified.
 
 ## Pointers
 
