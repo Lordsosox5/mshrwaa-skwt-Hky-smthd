@@ -1,7 +1,7 @@
 kind = "mobile"
 previewPath = "/"
 title = "مشروع سكوت"
-description = "A native Arabic-first reading app for the supernatural novel مشروع سكوت. Read the full story across its chapters with story-inspired AI illustrations, adjustable reading controls, and locally saved reading progress."
+description = "A native Arabic-first reading app for the supernatural novel مشروع سكوت. Read the full story across its chapters with illustrations and locally saved reading progress."
 version = "1.0.0"
 id = "artifacts/scott-story"
 router = "expo-domain"
