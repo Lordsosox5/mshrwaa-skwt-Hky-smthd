@@ -7,7 +7,7 @@ import { ImageBackground, NativeScrollEvent, NativeSyntheticEvent, Platform, Pre
 import { AppText as Text } from '@/components/AppText';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
-import { getChapter, getChapterIndex, chapterArtwork, chapters } from '@/lib/story';
+import { getChapter, getChapterIndex, getPart, chapterArtwork, chapters } from '@/lib/story';
 import { useReader } from '@/context/ReaderContext';
 import { readerPalettes } from '@/constants/colors';
 
@@ -15,6 +15,7 @@ export default function ReaderScreen() {
   const params = useLocalSearchParams<{ id: string }>();
   const id = typeof params.id === 'string' ? params.id : '0';
   const chapter = getChapter(id);
+  const part = chapter ? getPart(chapter.partId) : undefined;
   const chapterIndex = getChapterIndex(id);
   const colors = useColors();
   const insets = useSafeAreaInsets();
@@ -180,6 +181,9 @@ export default function ReaderScreen() {
           </View>
         ) : (
           <View style={[styles.chapterHeading, { borderBottomColor: pageColors.border }]}>
+            {part ? (
+              <Text style={[styles.chapterPart, { color: pageColors.muted }]}>{part.label} · {part.title}</Text>
+            ) : null}
             <Text style={[styles.chapterNumber, { color: pageColors.accent }]}>{chapter.heading}</Text>
             <Text style={[styles.chapterTitle, { color: pageColors.foreground }]}>{chapter.title}</Text>
           </View>
@@ -262,6 +266,7 @@ const styles = StyleSheet.create({
   artChapter: { color: '#F2C27F', fontSize: 11, fontWeight: '700', marginBottom: 4 },
   artTitle: { color: '#FFF8ED', fontSize: 24, fontWeight: '800', textAlign: 'right' },
   chapterHeading: { borderBottomWidth: 1, paddingBottom: 18, marginBottom: 20, alignItems: 'flex-end' },
+  chapterPart: { fontSize: 11, fontWeight: '600', marginBottom: 9 },
   chapterNumber: { fontSize: 12, fontWeight: '700', marginBottom: 7 },
   chapterTitle: { fontSize: 28, fontWeight: '800', textAlign: 'right' },
   paragraphs: { gap: 17 },

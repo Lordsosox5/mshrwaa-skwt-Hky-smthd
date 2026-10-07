@@ -6,7 +6,7 @@ import { AppText as Text, appFonts } from '@/components/AppText';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
-import { chapters } from '@/lib/story';
+import { chapters, parts } from '@/lib/story';
 import { useReader } from '@/context/ReaderContext';
 
 export default function ChaptersScreen() {
@@ -14,13 +14,27 @@ export default function ChaptersScreen() {
   const insets = useSafeAreaInsets();
   const { preferences } = useReader();
   const [search, setSearch] = useState('');
+  const chapterCount = new Intl.NumberFormat('ar').format(chapters.length);
   const filtered = useMemo(() => {
     const term = search.trim().toLocaleLowerCase();
     if (!term) return chapters;
-    return chapters.filter((chapter) =>
-      `${chapter.heading} ${chapter.title}`.toLocaleLowerCase().includes(term),
-    );
+    return chapters.filter((chapter) => {
+      const part = parts.find((item) => item.id === chapter.partId);
+      return `${chapter.heading} ${chapter.title} ${part?.label ?? ''} ${part?.title ?? ''}`
+        .toLocaleLowerCase()
+        .includes(term);
+    });
   }, [search]);
+  const chapterGroups = useMemo(
+    () =>
+      parts
+        .map((part) => ({
+          part,
+          chapters: filtered.filter((chapter) => chapter.partId === part.id),
+        }))
+        .filter((group) => group.chapters.length > 0),
+    [filtered],
+  );
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
@@ -32,7 +46,7 @@ export default function ChaptersScreen() {
             <Text style={[styles.title, { color: colors.foreground }]}>فصول الرواية</Text>
           </View>
           <View style={[styles.count, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.countText, { color: colors.foreground }]}>٢٠ فصلاً</Text>
+            <Text style={[styles.countText, { color: colors.foreground }]}>{chapterCount} فصلاً</Text>
           </View>
         </View>
 
@@ -62,43 +76,56 @@ export default function ChaptersScreen() {
           keyboardDismissMode="interactive"
           showsVerticalScrollIndicator={false}
         >
-          {filtered.length === 0 ? (
+          {chapterGroups.length === 0 ? (
             <View style={[styles.empty, { borderColor: colors.border }]}>
               <Ionicons name="search-outline" size={25} color={colors.mutedForeground} />
               <Text style={[styles.emptyTitle, { color: colors.foreground }]}>لا توجد فصول مطابقة</Text>
               <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>جرّب البحث بعنوان آخر.</Text>
             </View>
-          ) : filtered.map((chapter) => {
-            const progress = preferences.progressByChapter[chapter.id] ?? 0;
-            return (
-              <Pressable
-                key={chapter.id}
-                accessibilityRole="button"
-                testID={`chapter-${chapter.id}`}
-                onPress={() => router.push({ pathname: '/reader/[id]', params: { id: chapter.id } })}
-                style={({ pressed }) => [
-                  styles.row,
-                  { backgroundColor: colors.card, borderColor: colors.border },
-                  pressed && styles.pressed,
-                ]}
-              >
-                <View style={[styles.chapterIndex, { backgroundColor: colors.accent }]}>
-                  <Text style={[styles.indexText, { color: colors.accentForeground }]}>{chapter.number}</Text>
+          ) : chapterGroups.map(({ part, chapters: partChapters }) => (
+            <View key={part.id} style={styles.partGroup}>
+              <View style={styles.partHeading}>
+                <View style={styles.partHeadingCopy}>
+                  <Text style={[styles.partKicker, { color: colors.primary }]}>{part.label}</Text>
+                  <Text style={[styles.partTitle, { color: colors.foreground }]}>{part.title}</Text>
                 </View>
-                <View style={styles.rowCopy}>
-                  <Text style={[styles.rowKicker, { color: colors.mutedForeground }]}>{chapter.heading}</Text>
-                  <Text style={[styles.rowTitle, { color: colors.foreground }]} numberOfLines={1}>{chapter.title}</Text>
-                  <View style={styles.rowProgress}>
-                    <View style={[styles.miniTrack, { backgroundColor: colors.secondary }]}>
-                      <View style={[styles.miniFill, { width: `${progress}%`, backgroundColor: colors.primary }]} />
+                <Text style={[styles.partCount, { color: colors.mutedForeground }]}>
+                  {new Intl.NumberFormat('ar').format(partChapters.length)} فصلاً
+                </Text>
+              </View>
+              {partChapters.map((chapter) => {
+                const progress = preferences.progressByChapter[chapter.id] ?? 0;
+                return (
+                  <Pressable
+                    key={chapter.id}
+                    accessibilityRole="button"
+                    testID={`chapter-${chapter.id}`}
+                    onPress={() => router.push({ pathname: '/reader/[id]', params: { id: chapter.id } })}
+                    style={({ pressed }) => [
+                      styles.row,
+                      { backgroundColor: colors.card, borderColor: colors.border },
+                      pressed && styles.pressed,
+                    ]}
+                  >
+                    <View style={[styles.chapterIndex, { backgroundColor: colors.accent }]}>
+                      <Text style={[styles.indexText, { color: colors.accentForeground }]}>{chapter.number}</Text>
                     </View>
-                    <Text style={[styles.percent, { color: colors.mutedForeground }]}>{progress}%</Text>
-                  </View>
-                </View>
-                <Feather name="chevron-left" size={18} color={colors.mutedForeground} />
-              </Pressable>
-            );
-          })}
+                    <View style={styles.rowCopy}>
+                      <Text style={[styles.rowKicker, { color: colors.mutedForeground }]}>{chapter.heading}</Text>
+                      <Text style={[styles.rowTitle, { color: colors.foreground }]} numberOfLines={1}>{chapter.title}</Text>
+                      <View style={styles.rowProgress}>
+                        <View style={[styles.miniTrack, { backgroundColor: colors.secondary }]}>
+                          <View style={[styles.miniFill, { width: `${progress}%`, backgroundColor: colors.primary }]} />
+                        </View>
+                        <Text style={[styles.percent, { color: colors.mutedForeground }]}>{progress}%</Text>
+                      </View>
+                    </View>
+                    <Feather name="chevron-left" size={18} color={colors.mutedForeground} />
+                  </Pressable>
+                );
+              })}
+            </View>
+          ))}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -116,7 +143,13 @@ const styles = StyleSheet.create({
   searchWrap: { marginHorizontal: 22, marginBottom: 14, minHeight: 48, borderWidth: 1, borderRadius: 16, paddingHorizontal: 13, flexDirection: 'row-reverse', alignItems: 'center', gap: 10 },
   searchInput: { flex: 1, fontSize: 14, textAlign: 'right', paddingVertical: 10 },
   list: { flex: 1 },
-  listContent: { paddingHorizontal: 22, gap: 10 },
+  listContent: { paddingHorizontal: 22, gap: 14 },
+  partGroup: { gap: 9 },
+  partHeading: { paddingTop: 10, paddingBottom: 3, flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' },
+  partHeadingCopy: { alignItems: 'flex-end', gap: 3 },
+  partKicker: { fontSize: 10, fontWeight: '700', textAlign: 'right' },
+  partTitle: { fontSize: 15, fontWeight: '800', textAlign: 'right' },
+  partCount: { fontSize: 10, fontWeight: '600' },
   row: { minHeight: 83, borderRadius: 18, borderWidth: 1, paddingHorizontal: 13, paddingVertical: 12, flexDirection: 'row-reverse', alignItems: 'center', gap: 12 },
   chapterIndex: { width: 43, height: 49, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   indexText: { fontSize: 11, fontWeight: '800', textAlign: 'center' },
