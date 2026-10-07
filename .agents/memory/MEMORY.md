@@ -1,0 +1,1 @@
+- [Expo illustration asset sizes](expo-illustration-assets.md) — large scene PNGs can delay Expo’s initial preview; use compressed in-app derivatives.
