@@ -25,11 +25,14 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
       <StatusBar barStyle="light-content" />
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.content,
-          { paddingTop: Platform.OS === 'web' ? 67 : Math.max(12, insets.top * 0.15), paddingBottom: Platform.OS === 'web' ? 122 : 112 },
+      <View
+        style={[
+          styles.fixedHeader,
+          {
+            paddingTop: Platform.OS === 'web' ? 67 : Math.max(12, insets.top * 0.15),
+            backgroundColor: colors.background,
+            borderBottomColor: colors.border,
+          },
         ]}
       >
         <View style={styles.topbar}>
@@ -47,7 +50,16 @@ export default function HomeScreen() {
             <Feather name="sliders" size={19} color={colors.foreground} />
           </Pressable>
         </View>
+      </View>
 
+      <ScrollView
+        style={styles.scroll}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.content,
+          { paddingTop: 18, paddingBottom: Platform.OS === 'web' ? 122 : 112 },
+        ]}
+      >
         <View style={styles.coverHeader}>
           <Text style={[styles.coverHeaderTitle, { color: colors.mutedForeground }]}>أغلفة الرواية</Text>
           <Text style={[styles.coverCount, { color: colors.primaryForeground, backgroundColor: colors.primary }]}>
@@ -166,6 +178,8 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
+  fixedHeader: { paddingHorizontal: 22, paddingBottom: 12, borderBottomWidth: StyleSheet.hairlineWidth, zIndex: 1 },
+  scroll: { flex: 1 },
   content: { paddingHorizontal: 22, gap: 18 },
   topbar: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 },
   eyebrow: { fontSize: 12, fontWeight: '700', letterSpacing: 0.6, textAlign: 'right' },
