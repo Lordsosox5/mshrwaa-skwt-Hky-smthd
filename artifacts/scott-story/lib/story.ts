@@ -31,8 +31,25 @@ export const chapters: StoryChapter[] = [
 export const storyWordCount = storyData.wordCount + partTwoData.wordCount;
 
 export const chapterArtwork: Record<string, ImageSourcePropType> = {
+  '0': require('../assets/images/chapter-00.jpg'),
   '1': require('../assets/images/scott-cabin.jpg'),
+  '2': require('../assets/images/chapter-02.jpg'),
   '3': require('../assets/images/scott-hospital.jpg'),
+  '4': require('../assets/images/chapter-04.jpg'),
+  '5': require('../assets/images/chapter-05.jpg'),
+  '6': require('../assets/images/chapter-06.jpg'),
+  '7': require('../assets/images/chapter-07.jpg'),
+  '8': require('../assets/images/chapter-08.jpg'),
+  '9': require('../assets/images/chapter-09.jpg'),
+  '10': require('../assets/images/chapter-10.jpg'),
+  '11': require('../assets/images/chapter-11.jpg'),
+  '12': require('../assets/images/chapter-12.jpg'),
+  '13': require('../assets/images/chapter-13.jpg'),
+  '14': require('../assets/images/chapter-14.jpg'),
+  '15': require('../assets/images/chapter-15.jpg'),
+  '16': require('../assets/images/chapter-16.jpg'),
+  '17': require('../assets/images/chapter-17.jpg'),
+  '18': require('../assets/images/chapter-18.jpg'),
   '19': require('../assets/images/scott-church.jpg'),
 };
 

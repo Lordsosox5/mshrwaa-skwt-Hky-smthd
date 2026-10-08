@@ -1,12 +1,12 @@
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useMemo, useState } from 'react';
-import { Platform, Pressable, ScrollView, StatusBar, StyleSheet, TextInput, View } from 'react-native';
+import { Image, Platform, Pressable, ScrollView, StatusBar, StyleSheet, TextInput, View } from 'react-native';
 import { AppText as Text, appFonts } from '@/components/AppText';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
-import { chapters, parts } from '@/lib/story';
+import { chapterArtwork, chapters, parts } from '@/lib/story';
 import { useReader } from '@/context/ReaderContext';
 
 export default function ChaptersScreen() {
@@ -121,6 +121,15 @@ export default function ChaptersScreen() {
                       </View>
                     </View>
                     <Feather name="chevron-left" size={18} color={colors.mutedForeground} />
+                    {chapterArtwork[chapter.id] ? (
+                      <Image
+                        source={chapterArtwork[chapter.id]}
+                        style={styles.rowArtwork}
+                        resizeMode="cover"
+                        accessible={false}
+                        testID={`chapter-art-${chapter.id}`}
+                      />
+                    ) : null}
                   </Pressable>
                 );
               })}
@@ -160,6 +169,7 @@ const styles = StyleSheet.create({
   miniTrack: { height: 3, flex: 1, maxWidth: 90, borderRadius: 5, overflow: 'hidden' },
   miniFill: { height: '100%', borderRadius: 5 },
   percent: { fontSize: 9, minWidth: 28, textAlign: 'right' },
+  rowArtwork: { width: 54, height: 56, borderRadius: 12 },
   empty: { alignItems: 'center', justifyContent: 'center', padding: 28, borderWidth: 1, borderStyle: 'dashed', borderRadius: 20, gap: 9, marginTop: 28 },
   emptyTitle: { fontSize: 15, fontWeight: '700' },
   emptyText: { fontSize: 12 },
