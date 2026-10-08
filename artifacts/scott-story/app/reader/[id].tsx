@@ -171,7 +171,7 @@ export default function ReaderScreen() {
       >
         {art ? (
           <View style={styles.artFrame}>
-            <ImageBackground source={art} resizeMode="cover" style={styles.artImage}>
+            <ImageBackground source={art} resizeMode="contain" style={styles.artImage}>
               <LinearGradient colors={['rgba(10,10,10,0.02)', 'rgba(10,10,10,0.82)']} style={StyleSheet.absoluteFill} />
               <View style={styles.artCaption}>
                 <Text style={styles.artChapter}>{chapter.heading}</Text>
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
   themeButton: { minHeight: 36, flexDirection: 'row-reverse', alignItems: 'center', gap: 6, paddingHorizontal: 3 },
   themeLabel: { fontSize: 12 },
   article: { paddingHorizontal: 23, paddingTop: 20 },
-  artFrame: { height: 205, borderRadius: 22, overflow: 'hidden', marginBottom: 22 },
+  artFrame: { width: '100%', aspectRatio: 1, borderRadius: 22, overflow: 'hidden', marginBottom: 22 },
   artImage: { flex: 1, justifyContent: 'flex-end' },
   artCaption: { paddingHorizontal: 17, paddingBottom: 16, alignItems: 'flex-end' },
   artChapter: { color: '#F2C27F', fontSize: 11, fontWeight: '700', marginBottom: 4 },
