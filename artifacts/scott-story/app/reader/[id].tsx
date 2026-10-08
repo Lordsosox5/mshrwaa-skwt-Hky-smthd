@@ -1,9 +1,8 @@
 import { Feather, Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useRef } from 'react';
-import { ImageBackground, NativeScrollEvent, NativeSyntheticEvent, Platform, Pressable, ScrollView, StatusBar, StyleSheet, View } from 'react-native';
+import { Image, NativeScrollEvent, NativeSyntheticEvent, Platform, Pressable, ScrollView, StatusBar, StyleSheet, View } from 'react-native';
 import { AppText as Text } from '@/components/AppText';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
@@ -170,14 +169,14 @@ export default function ReaderScreen() {
         contentContainerStyle={[styles.article, { paddingBottom: Math.max(insets.bottom + 24, Platform.OS === 'web' ? 48 : 30) }]}
       >
         {art ? (
-          <View style={styles.artFrame}>
-            <ImageBackground source={art} resizeMode="contain" style={styles.artImage}>
-              <LinearGradient colors={['rgba(10,10,10,0.02)', 'rgba(10,10,10,0.82)']} style={StyleSheet.absoluteFill} />
-              <View style={styles.artCaption}>
-                <Text style={styles.artChapter}>{chapter.heading}</Text>
-                <Text style={styles.artTitle}>{chapter.title}</Text>
-              </View>
-            </ImageBackground>
+          <View style={styles.artSection}>
+            <View style={[styles.artFrame, { backgroundColor: pageColors.background }]}>
+              <Image source={art} resizeMode="contain" style={styles.artImage} />
+            </View>
+            <View style={styles.artCaption}>
+              <Text style={[styles.artChapter, { color: pageColors.accent }]}>{chapter.heading}</Text>
+              <Text style={[styles.artTitle, { color: pageColors.foreground }]}>{chapter.title}</Text>
+            </View>
           </View>
         ) : (
           <View style={[styles.chapterHeading, { borderBottomColor: pageColors.border }]}>
@@ -260,11 +259,12 @@ const styles = StyleSheet.create({
   themeButton: { minHeight: 36, flexDirection: 'row-reverse', alignItems: 'center', gap: 6, paddingHorizontal: 3 },
   themeLabel: { fontSize: 12 },
   article: { paddingHorizontal: 23, paddingTop: 20 },
-  artFrame: { width: '100%', aspectRatio: 1, borderRadius: 22, overflow: 'hidden', marginBottom: 22 },
-  artImage: { flex: 1, justifyContent: 'flex-end' },
-  artCaption: { paddingHorizontal: 17, paddingBottom: 16, alignItems: 'flex-end' },
-  artChapter: { color: '#F2C27F', fontSize: 11, fontWeight: '700', marginBottom: 4 },
-  artTitle: { color: '#FFF8ED', fontSize: 24, fontWeight: '800', textAlign: 'right' },
+  artSection: { marginBottom: 22 },
+  artFrame: { width: '100%', aspectRatio: 1, borderRadius: 22, overflow: 'hidden' },
+  artImage: { width: '100%', height: '100%' },
+  artCaption: { paddingHorizontal: 2, paddingTop: 10, alignItems: 'flex-end', gap: 4 },
+  artChapter: { fontSize: 11, fontWeight: '700' },
+  artTitle: { fontSize: 24, fontWeight: '800', textAlign: 'right' },
   chapterHeading: { borderBottomWidth: 1, paddingBottom: 18, marginBottom: 20, alignItems: 'flex-end' },
   chapterPart: { fontSize: 11, fontWeight: '600', marginBottom: 9 },
   chapterNumber: { fontSize: 12, fontWeight: '700', marginBottom: 7 },
