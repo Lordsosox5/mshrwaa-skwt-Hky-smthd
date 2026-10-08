@@ -51,6 +51,18 @@ export const chapterArtwork: Record<string, ImageSourcePropType> = {
   '17': require('../assets/images/chapter-17.jpg'),
   '18': require('../assets/images/chapter-18.jpg'),
   '19': require('../assets/images/scott-church.jpg'),
+  '20': require('../assets/images/chapter-20.jpg'),
+  '21': require('../assets/images/chapter-21.jpg'),
+  '22': require('../assets/images/chapter-22.jpg'),
+  '23': require('../assets/images/chapter-23.jpg'),
+  '24': require('../assets/images/chapter-24.jpg'),
+  '25': require('../assets/images/chapter-25.jpg'),
+  '26': require('../assets/images/chapter-26.jpg'),
+  '27': require('../assets/images/chapter-27.jpg'),
+  '28': require('../assets/images/chapter-28.jpg'),
+  '29': require('../assets/images/chapter-29.jpg'),
+  '30': require('../assets/images/chapter-30.jpg'),
+  '31': require('../assets/images/chapter-31.jpg'),
 };
 
 export const partCoverArtwork: Record<string, ImageSourcePropType> = {

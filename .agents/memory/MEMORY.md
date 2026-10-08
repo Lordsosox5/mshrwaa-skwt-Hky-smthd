@@ -1,1 +1,2 @@
 - [Expo illustration asset sizes](expo-illustration-assets.md) — large scene PNGs can delay Expo’s initial preview; use compressed in-app derivatives.
+- [Scott Story chapter art](scott-story-chapter-art.md) — every chapter in the two-volume story needs its own matching image on the reader page.
